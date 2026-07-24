@@ -1,0 +1,13 @@
+{
+  "name": "Alpaca Trade Statistics",
+  "short_name": "Alpaca Trade",
+  "description": "Statistiche dei portafogli e log delle operazioni di trading.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    { "src": "/app-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
