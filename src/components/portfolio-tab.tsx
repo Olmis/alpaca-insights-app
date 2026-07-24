@@ -13,7 +13,7 @@ import {
   Legend,
   Brush,
 } from "recharts";
-import { RefreshCw, Maximize2, X } from "lucide-react";
+import { RefreshCw, Maximize2, X, SlidersHorizontal } from "lucide-react";
 
 import { fetchPortfolio, type PortfolioRow } from "@/lib/trade-api.functions";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 const COLORS = [
@@ -83,7 +91,7 @@ function ChartView({
       <LineChart data={points} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
         <XAxis dataKey="date" tick={{ fontSize: 10 }} minTickGap={20} />
-        <YAxis tick={{ fontSize: 10 }} domain={["auto", "auto"]} width={55} />
+        <YAxis tick={{ fontSize: 10 }} domain={[0, "auto"]} width={55} />
         <Tooltip
           contentStyle={{
             background: "var(--popover)",
@@ -149,6 +157,7 @@ export function PortfolioTab() {
   const [filters, setFilters] = useState<{ data_inizio?: string; data_fine?: string }>({});
   const [visible, setVisible] = useState<Record<string, boolean>>({});
   const [fullscreen, setFullscreen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const { data, isFetching, refetch, error } = useQuery({
     queryKey: ["portfolio", filters],
@@ -188,6 +197,7 @@ export function PortfolioTab() {
       data_inizio: dataInizio || undefined,
       data_fine: dataFine || undefined,
     });
+    setFilterOpen(false);
   };
   const resetFilter = () => {
     setDataInizio("");
@@ -195,10 +205,12 @@ export function PortfolioTab() {
     setFilters({});
   };
 
+  const activeFilterCount =
+    (filters.data_inizio ? 1 : 0) + (filters.data_fine ? 1 : 0);
+
   const openFullscreen = useCallback(async () => {
     setFullscreen(true);
     try {
-      // best-effort landscape
       const el = document.documentElement;
       if (el.requestFullscreen) await el.requestFullscreen();
       const anyOrient = screen.orientation as unknown as {
@@ -225,51 +237,64 @@ export function PortfolioTab() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">Portafogli</h1>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => refetch()}
-          disabled={isFetching}
-        >
-          <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
-          <span className="ml-2">Aggiorna</span>
-        </Button>
+        <div className="flex gap-2">
+          <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+            <SheetTrigger asChild>
+              <Button size="sm" variant="outline">
+                <SlidersHorizontal className="h-4 w-4" />
+                <span className="ml-2">
+                  Filtri{activeFilterCount ? ` (${activeFilterCount})` : ""}
+                </span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom">
+              <SheetHeader>
+                <SheetTitle>Filtri</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 grid grid-cols-2 gap-2 px-4">
+                <div>
+                  <Label htmlFor="pi" className="text-xs">
+                    Data inizio
+                  </Label>
+                  <Input
+                    id="pi"
+                    type="date"
+                    value={dataInizio}
+                    onChange={(e) => setDataInizio(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pf" className="text-xs">
+                    Data fine
+                  </Label>
+                  <Input
+                    id="pf"
+                    type="date"
+                    value={dataFine}
+                    onChange={(e) => setDataFine(e.target.value)}
+                  />
+                </div>
+              </div>
+              <SheetFooter className="mt-4 flex-row gap-2">
+                <Button size="sm" onClick={applyFilter} className="flex-1">
+                  Applica
+                </Button>
+                <Button size="sm" variant="outline" onClick={resetFilter}>
+                  Reset
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+          </Button>
+        </div>
       </div>
-
-      <Card className="p-3">
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label htmlFor="pi" className="text-xs">
-              Data inizio
-            </Label>
-            <Input
-              id="pi"
-              type="date"
-              value={dataInizio}
-              onChange={(e) => setDataInizio(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="pf" className="text-xs">
-              Data fine
-            </Label>
-            <Input
-              id="pf"
-              type="date"
-              value={dataFine}
-              onChange={(e) => setDataFine(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="mt-2 flex gap-2">
-          <Button size="sm" onClick={applyFilter} className="flex-1">
-            Applica
-          </Button>
-          <Button size="sm" variant="outline" onClick={resetFilter}>
-            Reset
-          </Button>
-        </div>
-      </Card>
 
       {(apiErrors.length > 0 || error) && (
         <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
