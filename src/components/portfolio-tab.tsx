@@ -150,7 +150,7 @@ function ChartView({
   return <div className="h-full w-full">{content}</div>;
 }
 
-export function PortfolioTab() {
+export function PortfolioTab({ ver }: { ver: number }) {
   const fetchFn = useServerFn(fetchPortfolio);
   const [dataInizio, setDataInizio] = useState("");
   const [dataFine, setDataFine] = useState("");
@@ -160,8 +160,8 @@ export function PortfolioTab() {
   const [filterOpen, setFilterOpen] = useState(false);
 
   const { data, isFetching, refetch, error } = useQuery({
-    queryKey: ["portfolio", filters],
-    queryFn: () => fetchFn({ data: filters }),
+    queryKey: ["portfolio", ver, filters],
+    queryFn: () => fetchFn({ data: { ...filters, ver } }),
   });
 
   const rows = data?.risposta ?? [];

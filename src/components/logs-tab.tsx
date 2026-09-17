@@ -49,7 +49,7 @@ async function copyText(text: string) {
   }
 }
 
-export function LogsTab() {
+export function LogsTab({ ver }: { ver: number }) {
   const fetchFn = useServerFn(fetchLogs);
   const [dataInizio, setDataInizio] = useState("");
   const [dataFine, setDataFine] = useState("");
@@ -64,8 +64,8 @@ export function LogsTab() {
   const [hiddenLevels, setHiddenLevels] = useState<Record<string, boolean>>({});
 
   const { data, isFetching, refetch, error } = useQuery({
-    queryKey: ["logs", filters],
-    queryFn: () => fetchFn({ data: filters }),
+    queryKey: ["logs", ver, filters],
+    queryFn: () => fetchFn({ data: { ...filters, ver } }),
   });
 
   const rows = data?.risposta ?? [];
