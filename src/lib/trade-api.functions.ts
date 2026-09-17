@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
 const PORTFOLIO_URL =
-  "https://www.freepcitalia.com/area_negoziante/api_app.php?json_tradeapp_portafoglio";
+  "https://professionalpc.it/api_app.php?json_tradeapp_portafoglio";
 const LOG_URL =
-  "https://www.freepcitalia.com/area_negoziante/api_app.php?json_tradeapp_log";
+  "https://professionalpc.it/api_app.php?json_tradeapp_log";
 const PASSWORD = "tradeApp";
 
 export type ApiResponse<T> = {
@@ -18,16 +18,18 @@ type Filters = {
   data_inizio?: string;
   data_fine?: string;
   cerca?: string;
+  ver?: number;
 };
 
 async function callApi<T>(url: string, filters: Filters): Promise<ApiResponse<T>> {
+  const fullUrl = `${url}&ver=${filters.ver ?? 4}`;
   const body: Record<string, string> = { password: PASSWORD };
   if (filters.data_inizio) body.data_inizio = filters.data_inizio;
   if (filters.data_fine) body.data_fine = filters.data_fine;
   if (filters.cerca) body.cerca = filters.cerca;
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(fullUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),

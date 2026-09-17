@@ -14,6 +14,9 @@ type TabId = "portfolio" | "logs";
 
 function App() {
   const [tab, setTab] = useState<TabId>("portfolio");
+  const [ver, setVer] = useState<2 | 3 | 4>(4);
+
+  const cycleVer = () => setVer((v) => (v === 4 ? 2 : v === 2 ? 3 : 4));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -31,6 +34,13 @@ function App() {
               Portafogli & log operativi
             </div>
           </div>
+          <button
+            onClick={cycleVer}
+            className="ml-auto rounded-md border px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-accent"
+            title="Cambia versione API"
+          >
+            v{ver}
+          </button>
         </div>
       </header>
 
@@ -38,7 +48,7 @@ function App() {
         className="mx-auto max-w-2xl px-4 py-4"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 88px)" }}
       >
-        {tab === "portfolio" ? <PortfolioTab /> : <LogsTab />}
+        {tab === "portfolio" ? <PortfolioTab ver={ver} /> : <LogsTab ver={ver} />}
       </main>
 
       <nav
