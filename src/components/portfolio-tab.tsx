@@ -47,7 +47,9 @@ type ChartPoint = { date: string } & Record<string, number | string>;
 function buildChart(rows: PortfolioRow[]) {
   const markets = Array.from(new Set(rows.map((r) => r[1]))).sort();
   const byDate = new Map<string, ChartPoint>();
-  for (const [date, market, value] of rows) {
+  for (const [date, market, rawValue] of rows) {
+    const value = typeof rawValue === "number" ? rawValue : Number(rawValue);
+    if (!Number.isFinite(value)) continue;
     let p = byDate.get(date);
     if (!p) {
       p = { date };
