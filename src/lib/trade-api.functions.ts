@@ -29,7 +29,7 @@ async function callApi<T>(url: string, filters: Filters): Promise<ApiResponse<T>
   if (filters.cerca) body.cerca = filters.cerca;
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(fullUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
