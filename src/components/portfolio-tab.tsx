@@ -99,10 +99,10 @@ function ChartView({
             borderRadius: 8,
             fontSize: 12,
           }}
-          formatter={(v: number, name: string) => [
-            `${v.toFixed(2)} $`,
-            name,
-          ]}
+          formatter={(v: unknown, name: string) => {
+            const n = typeof v === "number" ? v : Number(v);
+            return [Number.isFinite(n) ? `${n.toFixed(2)} $` : "—", name];
+          }}
           labelFormatter={(l) => `Data: ${l}`}
         />
         <Legend wrapperStyle={{ fontSize: 12 }} />
